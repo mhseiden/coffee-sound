@@ -1,0 +1,22 @@
+{
+  "name": "reactive-web-audio",
+  "version": "0.0.0",
+  "authors": [
+    "Max Seiden <140dbs@gmail.com>"
+  ],
+  "description": "Reactive Web Audio Graph",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "closure-compiler": "0.2.9"
+  },
+  "dependencies": {
+    "ast-js": "~1.0.3"
+  }
+}
