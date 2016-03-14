@@ -17,18 +17,18 @@ do ->
 
   coffeesound.opcodes.io.AnalyzerNode =
   class AnalyzerNode extends coffeesound.opcodes.UnaryNode
-    constructor: (child,fftSize,smoothing,min,max,fBuffer,tBuffer,rate,state) ->
-      args = [fftSize,smoothing,min,max,rate.fBuffer,tBuffer,rate,state]
+    constructor: (child, fBuffer, tBuffer, fftSize = 2048, smoothing = 0.8, min = -100, max = -30) ->
+      fBuffer = [] unless fBuffer?
+      tBuffer = [] unless tBuffer?
+      args = [fftSize,smoothing,min,max,fBuffer,tBuffer]
       super(A_RATE,AnalyzerNode,child,args)
 
     fftSize:    -> @args[0]
     smoothing:  -> @args[1]
     min:        -> @args[2]
     max:        -> @args[3]
-    fBuffer:    -> @args[5]
-    tBuffer:    -> @args[6]
-    rate:       -> @args[7]
-    state:      -> @args[8]
+    fBuffer:    -> @args[4]
+    tBuffer:    -> @args[5]
 
   coffeesound.opcodes.io.ContextOutput =
   class ContextOutput extends coffeesound.opcodes.UnaryNode

@@ -1,5 +1,6 @@
 goog.provide "coffeesound.expressions"
 
+goog.require "coffeesound.external.knockout"
 goog.require "coffeesound.external.astjs"
 goog.require "coffeesound"
 
@@ -78,13 +79,6 @@ do ->
       bound = bindValue @, initial
       super(Variable,[bound])
 
-  coffeesound.expressions.ByteBufferContainer =
-  class ByteBufferContainer extends LeafExpression
-    constructor: (buffer) ->
-      initial = Uint8Array(size)
-      bound = bindValue @, initial
-      super(BufferContainer,[bound])
-
   # arithmetic - Add
   coffeesound.expressions.Add =
   class Add extends BinaryExpression
@@ -112,3 +106,42 @@ do ->
     constructor: (l,r) ->
       bindComputed @, -> l.value / r.value
       super(Div,l,r,[])
+
+
+  # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  # Array Data Containers 
+  # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  class LazyArray
+    fill: -> # noop by default
+    constructor: (@buffer) ->
+      Object.defineProperty @, "value",
+        set: (v) => @buffer = v
+        get: ( ) =>
+          @fill(@buffer)
+          return @buffer
+
+  class DelegatedArray extends LeafExpression
+    # (max) TODO - this could be done...the semantics emitting an event just kinda weird
+    # (i.e.) a read performs an update which results in an event getting fired...?
+    subscribe: -> throw new Error("cannot subscribe to changes from a DelegatedArray")
+
+    constructor: (ctor,size,data) ->
+      Object.defineProperty @, "value",
+        set: (v) => @container().value = v
+        get: ( ) => @container().value
+      super(ctor,[size,new LazyArray(data)])
+
+    size:      -> @args[0]
+    container: -> @args[1]
+
+  coffeesound.expressions.DelegatedByteArray =
+  class DelegatedByteArray extends DelegatedArray
+    constructor: (size = 0) ->
+      super(DelegatedByteArray, size, new Uint8Array(size))
+
+  coffeesound.expressions.DelegatedFloatArray =
+  class DelegatedFloatArray extends DelegatedArray
+    constructor: (size = 0) ->
+      super(DelegatedFloatArray, size, new Float32Array(size))
+
+
