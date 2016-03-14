@@ -3,6 +3,15 @@ goog.provide "coffeesound.expressions"
 goog.require "coffeesound.external.astjs"
 goog.require "coffeesound"
 
+###
+  TODO URGENT!!!
+  
+  We must flow the absolute context timestamp along with all observable
+  updates so we can correctly schedule updates on the timeline. This was
+  a major flaw in all the prior versions, and resulted in a lot of nasty
+  boilerplate in the client code to ensure event timing was correct.
+###
+
 do ->
   KO      = coffeesound.external.knockout
   ASTJS   = coffeesound.external.astjs
@@ -55,42 +64,49 @@ do ->
     constructor: (ctor,l,r,args) ->
       super(ctor,[l,r],args)
 
-# an immutable value
+  # an immutable value
   coffeesound.expressions.Literal =
   class Literal extends LeafExpression
     constructor: (literal) ->
       bound = bindComputed @, -> literal
       super(Literal,[bound])
 
-# a mutable, reactive value
+  # a mutable, reactive value
   coffeesound.expressions.Variable =
   class Variable extends LeafExpression
     constructor: (initial) ->
       bound = bindValue @, initial
       super(Variable,[bound])
 
-# arithmetic - Add
+  coffeesound.expressions.ByteBufferContainer =
+  class ByteBufferContainer extends LeafExpression
+    constructor: (buffer) ->
+      initial = Uint8Array(size)
+      bound = bindValue @, initial
+      super(BufferContainer,[bound])
+
+  # arithmetic - Add
   coffeesound.expressions.Add =
   class Add extends BinaryExpression
     constructor: (l,r) ->
       bindComputed @, -> l.value + r.value
       super(Add,l,r,[])
 
-# arithmetic - Sub
+  # arithmetic - Sub
   coffeesound.expressions.Sub =
   class Sub extends BinaryExpression
     constructor: (l,r) ->
       bindComputed @, -> l.value - r.value
       super(Sub,l,r,[])
 
-# arithmetic - Mul
+  # arithmetic - Mul
   coffeesound.expressions.Mul =
   class Mul extends BinaryExpression
     constructor: (l,r) ->
       bindComputed @, -> l.value * r.value
       super(Mul,l,r,[])
 
-# arithmetic - Div
+  # arithmetic - Div
   coffeesound.expressions.Div =
   class Div extends BinaryExpression
     constructor: (l,r) ->
