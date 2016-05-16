@@ -1,7 +1,10 @@
 goog.provide "coffeesound.compiler.planner"
 
 goog.require "coffeesound.external.astjs"
-goog.require "coffeesound.compiler.planner.opcodes"
+goog.require "coffeesound.compiler.planner.opcodes.io"
+goog.require "coffeesound.compiler.planner.opcodes.generators"
+goog.require "coffeesound.compiler.planner.opcodes.math"
+goog.require "coffeesound.compiler.planner.opcodes.modifiers"
 
 do ->
   ASTJS = coffeesound.external.astjs
@@ -11,10 +14,10 @@ do ->
   class Planner extends ASTJS.Planner
     constructor: (extra = []) ->
       builtin = [
-        new opcodes.IOStrategy(),
-        new opcodes.GeneratorStrategy(),
-        new opcodes.MathStrategy(),
-        new opcodes.ModifierStrategy()]
+        new opcodes.io.Strategy(),
+        new opcodes.generators.Strategy(),
+        new opcodes.math.Strategy(),
+        new opcodes.modifiers.Strategy()]
 
       super(extra.concat(builtin))
 
