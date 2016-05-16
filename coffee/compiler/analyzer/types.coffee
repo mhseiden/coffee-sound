@@ -20,7 +20,9 @@ do ->
     constructor: -> super()
 
     execute: (tree) ->
-      tree.transform (node) ->
+      tree.transformUp (node) ->
         newArgs = _.map node.args, (arg) -> if arg instanceof ExpressionTree then arg else new Literal(arg)
-        return node.copy(newArgs,node.children)
+        newNode = node.copy(newArgs,node.children)
+        newNode.nodeid = node.nodeid # injecting literals doesn't change the node's meaning
+        return newNode
 

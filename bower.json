@@ -17,6 +17,6 @@
     "closure-compiler": "0.2.9"
   },
   "dependencies": {
-    "ast-js": "~1.0.3"
+    "ast-js": "~1.0"
   }
 }
