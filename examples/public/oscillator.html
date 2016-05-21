@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="/css/reset.css"></link>
+    <script type="text/javascript" src="/js/coffee-sound.js"></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/oscillator.js"></script>
+  </head>
+  <body>
+    <style>
+      .control-bank .label    { width: 150px; }
+      .control-bank .control  { width: 150px; }
+    </style>
+    <div class="container">
+      <h1>Oscillator Demo</h1>
+      <hr/>
+      <div class="control-bank">
+        <label class="label" for="frequency">Frequency (hz)</label>
+        <input class="control" data-bind="value:frequency" id="frequency" name="frequency" type="number" value="220"></input>
+      </div>
+      <div class="control-bank">
+        <label class="label" for="detune">Detune</label>
+        <input class="control" data-bind="value:detune" id="detune" name="detune" type="range" min="-100" max="100" step="1" value="0"></input>
+      </div>
+      <div class="control-bank">
+        <label class="label" for="waveform">Waveform</label>
+        <select class="control" data-bind="value:waveform" id="waveform" name="waveform">
+          <option value="sine">Sine Wave</option>
+          <option value="square">Square Wave</option>
+          <option value="sawtooth">Sawtooth Wave</option>
+          <option value="triangle">Triangle Wave</option>
+        </select>
+      </div>
+      <hr/>
+      <div class="control-bank">
+        <label class="label" for="volume">Output Volume</label>
+        <input class="control" data-bind="value:volume" id="volume" name="volume" type="range" min="0" max="1" step="0.01" value="0.25"></input>
+      </div>
+    <div>
+  </body>
+</html>

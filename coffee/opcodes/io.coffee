@@ -6,6 +6,11 @@ goog.require "coffeesound.opcodes"
 do ->
   A_RATE = coffeesound.RATE.A_RATE
 
+  coffeesound.opcodes.io.AudioBufferInput =
+  class AudioBufferInput extends coffeesound.opcodes.LeafNode
+    constructor: (buffer,detune,loopOn,loopStart,loopEnd,playbackRate) ->
+      super(A_RATE,AudioBufferInput,[buffer])
+
   coffeesound.opcodes.io.URLStreamInput =
   class URLStreamInput extends coffeesound.opcodes.LeafNode
     constructor: (src,play) ->

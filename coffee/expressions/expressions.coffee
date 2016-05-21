@@ -111,6 +111,7 @@ do ->
   # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # Array Data Containers 
   # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
   class LazyArray
     fill: -> # noop by default
     constructor: (@buffer) ->
@@ -144,4 +145,13 @@ do ->
     constructor: (size = 0) ->
       super(DelegatedFloatArray, size, new Float32Array(size))
 
+  # (max) TODO - the compiler should reactively decode the given buffer
+  coffeesound.expressions.EncodedAudioBuffer =
+  class EncodedAudioBuffer extends LeafExpression
+    constructor: (buffer) ->
+      super(EncodedAudioBuffer,[buffer])
 
+  coffeesound.expressions.DecodedAudioBuffer =
+  class DecodedAudioBuffer extends LeafExpression
+    constructor: (buffer) ->
+      super(DecodedAudioBuffer,[buffer])

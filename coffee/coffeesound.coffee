@@ -1,43 +1,51 @@
 goog.provide "coffeesound"
 
 goog.require "coffeesound.external.astjs"
-coffeesound.external.astjs = window.astjs
-
 goog.require "coffeesound.external.knockout"
-coffeesound.external.knockout = window.ko
 
-coffeesound.RATE =
-  ANY_RATE  : "ANY_RATE"
-  A_RATE    : "A_RATE"
-  K_RATE    : "K_RATE"
-  E_RATE    : "E_RATE"
+do ->
+  window = @ # (max) TODO - make this more robust, if need be
+  navigator = window["navigator"]
 
-coffeesound.options =
-  microphone  : off
-  webmidi     : off
+  # link the external libraries into the external namespace
+  coffeesound.external.knockout = window.ko
+  coffeesound.external.astjs = window.astjs
 
-coffeesound.initialize = ->
-  unless coffeesound._startupPromise?
-    coffeesound._startupPromise = Promise.resolve do ->
-      if "undefined" != typeof(AudioContext)
-        coffeesound._context = new AudioContext
-      else
-        coffeesound._context = new webkitAudioContext
+  # link coffeesound into the global window
+  window.coffeesound = coffeesound
 
-      # TODO - if WebMidi is enabled, initialize it
+  coffeesound.RATE =
+    ANY_RATE  : "ANY_RATE"
+    A_RATE    : "A_RATE"
+    K_RATE    : "K_RATE"
+    E_RATE    : "E_RATE"
 
-      # if the mic is enabled, initialize it
-      if coffeesound.options.microphone is on
-        return new Promise (res,rej) ->
-          if "undefined" != typeof(navigator.webkitGetUserMedia)
-            navigator.getUserMedia = navigator.webkitGetUserMedia
+  coffeesound.options =
+    microphone  : off
+    webmidi     : off
 
-          if navigator.getUserMedia?
-            cback = ((m) -> coffeesound._microphone = m; res())
-            eback = ((e) -> console.log("unable to initialize microphone",e); res())
-            navigator.getUserMedia((audio: true),cback,eback)
-          else
-            console.log("microphone access is not supported")
-            res()
+  coffeesound.initialize = ->
+    unless coffeesound._startupPromise?
+      coffeesound._startupPromise = Promise.resolve do ->
+        if "undefined" != typeof(AudioContext)
+          coffeesound._context = new AudioContext
+        else
+          coffeesound._context = new webkitAudioContext
 
-  return coffeesound._startupPromise
+        # TODO - if WebMidi is enabled, initialize it
+
+        # if the mic is enabled, initialize it
+        if coffeesound.options.microphone is on
+          return new Promise (res,rej) ->
+            if "undefined" != typeof(navigator.webkitGetUserMedia)
+              navigator.getUserMedia = navigator.webkitGetUserMedia
+
+            if navigator.getUserMedia?
+              cback = ((m) -> coffeesound._microphone = m; res())
+              eback = ((e) -> console.log("unable to initialize microphone",e); res())
+              navigator.getUserMedia((audio: true),cback,eback)
+            else
+              console.log("microphone access is not supported")
+              res()
+
+    return coffeesound._startupPromise
