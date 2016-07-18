@@ -47,6 +47,7 @@ doClosureCompile = (filename,formatting) ->
   if formatting?
     args.compilerFlags.formatting = formatting
 
+  # (max) TODO - prune unneeded deps out of here
   Gulp.src([COMPILED_JS_SRC].concat(EXTERNAL_LIBS))
     .pipe(Closure(args))
     .pipe(Gulp.dest(BASE_DIR))

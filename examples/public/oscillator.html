@@ -1,9 +1,17 @@
 <html>
   <head>
     <link type="text/css" rel="stylesheet" href="/css/reset.css"></link>
-    <script type="text/javascript" src="/js/coffee-sound.js"></script>
     <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/coffee-sound.js"></script>
     <script type="text/javascript" src="/js/oscillator.js"></script>
+    <script>
+      $.ajax({
+        url: "/js/oscillator.js",
+        dataType: "text",
+        type: "GET",
+        success: function(text) { $("#code").text(text); }
+      });
+    </script>
   </head>
   <body>
     <style>
@@ -30,11 +38,12 @@
           <option value="triangle">Triangle Wave</option>
         </select>
       </div>
-      <hr/>
       <div class="control-bank">
         <label class="label" for="volume">Output Volume</label>
         <input class="control" data-bind="value:volume" id="volume" name="volume" type="range" min="0" max="1" step="0.01" value="0.25"></input>
       </div>
-    <div>
+      <hr/>
+      <pre id="code" class="code"></pre>
+    </div>
   </body>
 </html>

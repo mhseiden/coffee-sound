@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="/css/reset.css"></link>
+    <script type="text/javascript" src="/js/coffee-sound.js"></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/audiobuffer.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $.ajax({
+          url: "/js/audiobuffer.js",
+          type: "GET",
+          dataType: "text",
+          success: function(text) { $("#code").text(text); }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <style>
+      .control-bank .label    { width: 150px; }
+      .control-bank .control  { width: 150px; }
+    </style>
+    <div class="container">
+      <hr/>
+      <pre id="code" class="code"></pre>
+    </div>
+  </body>
+</html>
