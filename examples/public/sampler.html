@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="/css/reset.css"></link>
+    <script type="text/javascript" src="/js/coffee-sound.js"></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/audiobuffer.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $.ajax({
+          url: "/js/audiobuffer.js",
+          type: "GET",
+          dataType: "text",
+          success: function(text) { $("#code").text(text); }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <style>
+      .sampler { width: 720px; height: 150px; position: relative; border: 1px solid #999; }
+      .handle-bar { width: 1px; height: 100%; background-color: red; position: absolute; top: 0; }
+      .grip { width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+        position: absolute; left: 0; top: -16px; cursor: pointer; }
+      .grip-left { border-left: 12px solid red; }
+      .grip-right { border-right: 12px solid red; left: -11px; }
+
+      .control-bank .label    { width: 200px; }
+      .control-bank .control  { width: 150px; }
+      .control-bank .button  { width: 150px; }
+    </style>
+    <div class="container">
+      <h1><a href="/">Demos</a> - Sampler</h1>
+      <hr/>
+      <div id="sampler" class="sampler">
+        <div style="left: 25%" class="handle-bar"><div class="grip grip-left"></div></div>
+        <div style="left: 75%" class="handle-bar"><div class="grip grip-right"></div></div>
+        <canvas id="waveform" class="waveform" width=720 height=150></canvas>
+      </div>
+      <hr/>
+      <div class="control-bank">
+        <label class="label" for="play">Trigger Sample</label>
+        <button class="button" id="play" name="play" data-bind="click:function() { bang.bang(); }">Play Selection</button>
+      </div>
+      <div class="control-bank">
+        <label class="label" for="multi">Multi Playback</label>
+        <input class="control" data-bind="checked:multi" id="multi" name="multi" type="checkbox"></input>
+      </div>
+      <div class="control-bank">
+        <label class="label" for="volume">Output Volume</label>
+        <input class="control" data-bind="value:volume" id="volume" name="volume" type="range" min="0" max="1" step="0.01" value="0.25"></input>
+      </div>
+      <hr/>
+      <pre id="code" class="code"></pre>
+    </div>
+    <script>
+      var renderWaveform = (function() {
+        var CANVAS_ELEM = document.getElementById("waveform"),
+            CANVAS_WIDTH = parseInt(CANVAS_ELEM.getAttribute("width")),
+            CANVAS_HEIGHT = parseInt(CANVAS_ELEM.getAttribute("height")),
+            HALF_HEIGHT = CANVAS_HEIGHT / 2,
+            DOTS_PER_BATCH = 1 << 19;
+
+        // (max) XXX - this assumes stero audio tracks
+        return function(audiobuffer, increment) {
+          return new Promise(function(resolve) {
+            var ctx = CANVAS_ELEM.getContext("2d"),
+                length = +audiobuffer.length,
+                lchan = audiobuffer.getChannelData(0),
+                rchan = audiobuffer.getChannelData(1),
+                xPos = function(i) { return CANVAS_WIDTH * (i / length); },
+                yFac = function(i) { return Math.abs((lchan[i] + rchan[i]) / 2.0); };
+
+            // clear the canvas before we render a new audiobuffer
+            ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+            var renderBatch = function(offset, incr) {
+              // (max) NOTE - interestingly, drawing the audiobuffer as-is does not
+              // yield the most appealing waveform...as such we do a poor-mans version
+              // of resampling, where we simply just skip offsets with a fixed stride.
+              // This works reasonably well, although the resulting waveforms look a bit
+              // frail in comparison to their "bushier" (but confusing) hi-res siblings :-)
+              //
+              // (max) XXX - there's an odd js (v8?) bug afoot here...essentially if 'limit'
+              // is passed as a fn arg, then the batched render just doesn't work! The draw
+              // calls definitely go through to the canvas context (i.e. this fn can render
+              // simple squares) however the calls to render lines never get flushed to the
+              // canvas. On the one hand, it seems like the render queue gets flooded and
+              // API calls are dropped...however it's odd that giving the runtime / JIT more
+              // explicit info about the loop bounds would result in *correct* behavior...
+              for(var limit = offset + DOTS_PER_BATCH; offset < limit; offset += incr) {
+                let x = xPos(offset), y = yFac(offset);
+                ctx.beginPath();
+                ctx.moveTo(x, HALF_HEIGHT - (y * HALF_HEIGHT));
+                ctx.lineTo(x, HALF_HEIGHT + (y * HALF_HEIGHT));
+                ctx.stroke();
+              }
+            };
+
+            (function render(remaining) {
+              if(0 >= remaining) return resolve();
+              requestAnimationFrame(render.bind(null, remaining - DOTS_PER_BATCH));
+              renderBatch(length - remaining, increment || 1);
+            })(length);
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>

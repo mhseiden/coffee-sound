@@ -1,0 +1,112 @@
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="/css/reset.css"></link>
+    <script type="text/javascript" src="/js/d3.js"></script>
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/coffee-sound.js"></script>
+    <script type="text/javascript" src="/js/visualizer.js"></script>
+    <script>
+      $.ajax({
+        url: "/js/visualizer.js",
+        dataType: "text",
+        type: "GET",
+        success: function(text) { $("#code").text(text); }
+      });
+    </script>
+  </head>
+  <body>
+    <style>
+      .control-bank .label    { width: 225px; }
+      .control-bank .control  { width: 150px; }
+    </style>
+    <div class="container">
+      <h1><a href="/">Demos</a> - Visualizer</h1>
+      <hr/>
+      <div id="visualizer" class="visualizer">
+      </div>
+      <hr/>
+      <div class="control-bank">
+        <label class="label" for="frequency">Minimum DBs (FFT)</label>
+        <input class="control" data-bind="value:minDecibels,attr:{title:minDecibels}" id="minDecibels" name="minDecibels" type="range" min="-255" max="0" step="1"></input>
+      </div>
+      <div class="control-bank">
+        <label class="label" for="frequency">Maximum DBs (FFT)</label>
+        <input class="control" data-bind="value:maxDecibels,attr:{title:maxDecibels}" id="maxDecibels" name="maxDecibels" type="range" min="-255" max="0" step="1"></input>
+      </div>
+      <div class="control-bank">
+        <label class="label" for="frequency">FFT Smoothing</label>
+        <input class="control" data-bind="value:smoothing,attr:{title:smoothing}" id="smoothing" name="smoothing" type="range" min="0.01" max="1.00" step="0.01" value="0.7"></input>
+      </div>
+      <div class="control-bank">
+        <label class="label" for="frequency">Output Volume</label>
+        <input class="control" data-bind="value:volume,attr:{title:volume}" id="volume" name="volume" type="range" value="0.25" min="0.0" max="1.0" step="0.01"></input>
+      </div>
+      <hr/>
+      <pre id="code" class="code"></pre>
+    </div>
+
+    <!-- d3 visualizer -->
+    <script type="text/javascript">
+
+      var updateViz = (function() {
+        var VIZ_HEIGHT = 150,
+            VIZ_WIDTH = 680,
+            BIN_LBOUND = Math.log10(20),
+            BIN_UBOUND = Math.log10(20000),
+            BIN_RANGE = BIN_UBOUND - BIN_LBOUND,
+            BIN_COUNT = 128;
+            BIN_BOUNDS = [];
+
+        // create the frequency bin upper bounds for the visualizer
+        for(var i = 0; i < BIN_COUNT; ++i) {
+          var logVal = BIN_LBOUND + (((i+1) / BIN_COUNT) * BIN_RANGE);
+          BIN_BOUNDS[i] = Math.round(Math.pow(10, logVal));
+        }
+
+        // fn for aggregating tranforming fft data into bins
+        var doFrequencyBinning = function(fData, bData) {
+          var i = 0, l = fData.length, b = 0, c = 0, s = 0;
+          for(; i < l; ++i) {
+            let fftLog = BIN_LBOUND + ((i / (l - 1)) * BIN_RANGE);
+            let fftFreq = Math.round(Math.pow(10, fftLog));
+            if(BIN_BOUNDS[b] > fftFreq) {
+              c++; s += fData[i];
+            } else {
+              let avg = s / (c+1);
+              bData[b++] = Number.isFinite(avg) ? avg : 0.0;
+              s = c = 0;
+            }
+          }
+        };
+
+        var bData = new Uint8Array(BIN_COUNT);
+        var svg = d3.select(".visualizer").append("svg").attr("height", 20 + VIZ_HEIGHT).attr("width", 40 + VIZ_WIDTH);
+        var bars = svg.append("g");
+        var viz = bars.selectAll("rect").data(bData).enter().append("rect")
+          .attr("transform", "translate(18,0)")
+          .attr("x", function(d,i) { return i * (VIZ_WIDTH / BIN_COUNT); })
+          .attr("width", Math.max(0, (VIZ_WIDTH / BIN_COUNT) * 0.5));
+
+        var scale = d3.scaleLog();
+        scale.range([0, VIZ_WIDTH]);
+        scale.domain([20,20000]);
+        
+        var axis = d3.axisBottom(scale);
+        axis.tickValues([20, 32, 50, 78, 125, 200, 320, 500, 800, 1250, 2000, 3200, 5000, 8000, 12500, 20000]);
+        axis.tickFormat(function(d) { return d3.format(",.0f")(d) + "hz"; });
+
+        svg.append("g")
+          .attr("transform", "translate(18,"+VIZ_HEIGHT+")")
+          .call(axis);
+
+        return function(fData) {
+          doFrequencyBinning(fData, bData);
+          bars.selectAll("rect").data(bData)
+            .attr("y", function(d) { return VIZ_HEIGHT - (VIZ_HEIGHT * (d / 255)); })
+            .attr("height", function(d) { return VIZ_HEIGHT * (d / 255); })
+            .attr("fill", function(d) { return "rgb(0, 0, 255)"; });
+        };
+      })();
+    </script>
+  </body>
+</html>

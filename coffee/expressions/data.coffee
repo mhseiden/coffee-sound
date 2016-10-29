@@ -7,7 +7,7 @@ do ->
   KO = coffeesound.external.knockout
 
   { ExpressionTree, UnaryExpression, LeafExpression } = coffeesound.expressions
-  { bindValue, bindComputed } = coffeesound.expressions
+  { bindValue, bindComputed, bindSubscribe } = coffeesound.expressions
 
   # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   # Array Data Containers 
@@ -56,7 +56,7 @@ do ->
       super(DecodedAudioBuffer,[bound])
 
   coffeesound.expressions.data.EncodedAudioBuffer =
-  class DecodedAudioBuffer extends LeafExpression
+  class EncodedAudioBuffer extends LeafExpression
     constructor: (initial) ->
       @input = input = KO.observable()
       @output = output = KO.observable()
@@ -67,6 +67,9 @@ do ->
       Object.defineProperty @, "value",
         set: (v) -> input(v)
         get: ( ) -> output()
+
+      # subscribe to changes in the decoded audio
+      bindSubscribe @, output
 
     decode: (output,data) ->
       coffeesound._context.decodeAudioData(data)

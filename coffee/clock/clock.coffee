@@ -3,21 +3,22 @@ goog.provide "coffeesound.clock"
 goog.require "coffeesound"
 
 coffeesound.initialize().then ->
-    context = coffeesound._context
-
     CLOCK_LENGTH  = 1024
     ONCE_INTERVAL = -1
 
     context = coffeesound._context
 
+    ticks = 0
+    timeOffset = 0.0
     bpm = 120
     resolution = 16
-    secondsPerTick = 60.0 / (bpm * resolution)
-    timeOffset = 0.0
+
+    computeSecondsPerTick = -> 60.0 / (bpm * resolution)
+    secondsPerTick = computeSecondsPerTick()
 
     removed = {}
     clock = []
-    do -> clock[idx] = [] for idx in [0...CLOCK_LENGTH]
+    do -> clock[idx] = [] for idx in [0...CLOCK_LENGTH] by 1
 
     nextCallbackID = 1
     clockPointer = 0
@@ -25,8 +26,10 @@ coffeesound.initialize().then ->
     lastSeenTick = 0
 
     checkClock = ->
-      basePointer = clockPointer
+      ++ticks # (max) TODO - what tick # should a callback see...?
+      requestAnimationFrame(checkClock)
 
+      basePointer = clockPointer
       currentTime = context.currentTime
       nextTick = computeNextTick(currentTime)
       if lastSeenTick != nextTick
@@ -43,8 +46,6 @@ coffeesound.initialize().then ->
                 console.log(e)
               addCallback(offset,callback)
 
-      requestAnimationFrame(checkClock)
-
     coffeesound.clock.bpm = (bpm0) ->
       bpm = bpm0
       secondsPerTick = computeSecondsPerTick()
@@ -52,9 +53,6 @@ coffeesound.initialize().then ->
     coffeesound.clock.resolution = (resolution0) ->
       resolution = resolution0
       secondsPerTick = computeSecondsPerTick()
-
-    computeSecondsPerTick = ->
-      60.0 / (bpm * resolution)
 
     coffeesound.clock.cancel = (id) ->
       removed[id] = true
@@ -96,4 +94,5 @@ coffeesound.initialize().then ->
       relativeTick = Math.ceil(now / secondsPerTick) * secondsPerTick
       return relativeTick + timeOffset
 
+    # kick off the clock party
     requestAnimationFrame(checkClock)

@@ -82,3 +82,13 @@ do ->
       bound = bindValue @, initial
       super(Variable,[bound])
 
+  # a trigger, analogous to a Max/MSP bang!
+  coffeesound.expressions.Bang =
+  class Bang extends LeafExpression
+    constructor: ->
+      @handle = handle = ko.observable(null)
+      bindSubscribe @, handle
+      super(Bang,[])
+
+    bang: -> @handle.valueHasMutated()
+

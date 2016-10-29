@@ -3,7 +3,7 @@ goog.provide "coffeesound.compiler.planner.opcodes.io"
 goog.require "coffeesound.external.astjs"
 goog.require "coffeesound.compiler.planner.utils"
 goog.require "coffeesound.opcodes.io"
-goog.require "coffeesound.expressions"
+goog.require "coffeesound.expressions.data"
 
 do ->
   ASTJS = coffeesound.external.astjs
@@ -13,7 +13,7 @@ do ->
   class Strategy extends ASTJS.PlannerStrategy
     execute: (tree) ->
       context = coffeesound._context
-      expr = coffeesound.expressions
+      data = coffeesound.expressions.data
       io = coffeesound.opcodes.io
 
       if tree instanceof io.URLStreamInput
@@ -53,15 +53,15 @@ do ->
         # range...as such this API also does not specify any particular
         # behavior beyond that of the underlying WebAudio implementation...
         fBuffer = tree.fBuffer()
-        if fBuffer instanceof expr.DelegatedByteArray
+        if fBuffer instanceof data.DelegatedByteArray
           fBuffer.container().fill = (b) -> analyzer.getByteFrequencyData(b)
-        else if fBuffer instanceof expr.DelegatedFloatArray
+        else if fBuffer instanceof data.DelegatedFloatArray
           fBuffer.container().fill = (b) -> analyzer.getFloatFrequencyData(b)
 
         tBuffer = tree.tBuffer()
-        if tBuffer instanceof expr.DelegatedByteArray
+        if tBuffer instanceof data.DelegatedByteArray
           tBuffer.container().fill = (b) -> analyzer.getByteTimeDomainData(b)
-        else if tBuffer instanceof expr.DelegatedFloatArray
+        else if tBuffer instanceof data.DelegatedFloatArray
           tBuffer.container().fill = (b) -> analyzer.getFloatTimeDomainData(b)
 
         return [analyzer]

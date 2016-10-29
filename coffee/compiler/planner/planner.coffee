@@ -14,6 +14,7 @@ do ->
   class Planner extends ASTJS.Planner
     constructor: (extra = []) ->
       builtin = [
+        new opcodes.buffers.Strategy(),
         new opcodes.io.Strategy(),
         new opcodes.generators.Strategy(),
         new opcodes.math.Strategy(),
