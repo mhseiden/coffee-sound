@@ -1,12 +1,11 @@
+# general ignores
 *.swp
 node_modules
 bower_components
 external
-js
-coffee_old
-coffee_old_2
-bin
-test/server
-test/deps.js
-coffee-sound.js
-coffee-sound.min.js
+
+# root-dir ignores
+/js
+/bin
+/coffee-sound.js
+/coffee-sound.min.js
