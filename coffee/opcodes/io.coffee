@@ -8,11 +8,13 @@ do ->
 
   coffeesound.opcodes.io.AudioBufferInput =
   class AudioBufferInput extends coffeesound.opcodes.LeafNode
+    nodeName: -> "AudioBufferInput"
     constructor: (buffer,detune,loopOn,loopStart,loopEnd,playbackRate) ->
       super(A_RATE,AudioBufferInput,[buffer])
 
   coffeesound.opcodes.io.URLStreamInput =
   class URLStreamInput extends coffeesound.opcodes.LeafNode
+    nodeName: -> "URLStreamInput"
     constructor: (src,play) ->
       args = [src,play]
       super(A_RATE,URLStreamInput,args)
@@ -22,6 +24,7 @@ do ->
 
   coffeesound.opcodes.io.MicrophoneInput =
   class MicrophoneInput extends coffeesound.opcodes.LeafNode
+    nodeName: -> "MicrophoneInput"
     constructor: (active) ->
       super(A_RATE,MicrophoneInput,[active])
 
@@ -29,6 +32,7 @@ do ->
 
   coffeesound.opcodes.io.AnalyzerNode =
   class AnalyzerNode extends coffeesound.opcodes.UnaryNode
+    nodeName: -> "Analyzer"
     constructor: (child, fBuffer, tBuffer, fftSize = 2048, smoothing = 0.8, min = -100, max = -30) ->
       fBuffer = [] unless fBuffer?
       tBuffer = [] unless tBuffer?
@@ -44,11 +48,13 @@ do ->
 
   coffeesound.opcodes.io.ContextOutput =
   class ContextOutput extends coffeesound.opcodes.UnaryNode
+    nodeName: -> "ContextOutput"
     constructor: (child) ->
       super(A_RATE,ContextOutput,child,[])
 
   coffeesound.opcodes.io.ExtractChannel =
   class ExtractChannel extends coffeesound.opcodes.UnaryNode
+    nodeName: -> "ExtractChannel"
     constructor: (child,index) ->
       super(A_RATE,ExtractChannel,child,[index])
 
@@ -56,5 +62,6 @@ do ->
 
   coffeesound.opcodes.io.StereoStreamConstructor =
   class StereoStreamConstructor extends coffeesound.opcodes.BinaryNode
+    nodeName: -> "StereoStreamConstructor"
     constructor: (left,right) ->
       super(A_RATE,StereoStreamConstructor,left,right,[])

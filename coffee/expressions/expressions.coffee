@@ -71,6 +71,7 @@ do ->
   # an immutable value
   coffeesound.expressions.Literal =
   class Literal extends LeafExpression
+    nodeName: -> "Literal"
     constructor: (literal) ->
       bound = bindComputed @, -> literal
       super(Literal,[bound])
@@ -78,6 +79,7 @@ do ->
   # a mutable, reactive value
   coffeesound.expressions.Variable =
   class Variable extends LeafExpression
+    nodeName: -> "Variable"
     constructor: (initial) ->
       bound = bindValue @, initial
       super(Variable,[bound])
@@ -85,6 +87,7 @@ do ->
   # a trigger, analogous to a Max/MSP bang!
   coffeesound.expressions.Bang =
   class Bang extends LeafExpression
+    nodeName: -> "Bang"
     constructor: ->
       @handle = handle = ko.observable(null)
       bindSubscribe @, handle

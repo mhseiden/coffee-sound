@@ -21,8 +21,10 @@ do ->
     E_RATE    : "E_RATE"
 
   coffeesound.options =
-    microphone  : off
-    webmidi     : off
+    mic   : off
+    midi  : off
+
+  coffeesound.SAMPLES_PER_SECOND = NaN
 
   coffeesound.initialize = ->
     unless coffeesound._startupPromise?
@@ -35,7 +37,7 @@ do ->
         # TODO - if WebMidi is enabled, initialize it
 
         # if the mic is enabled, initialize it
-        if coffeesound.options.microphone is on
+        if coffeesound.options.mic is on
           return new Promise (res,rej) ->
             if "undefined" != typeof(navigator.webkitGetUserMedia)
               navigator.getUserMedia = navigator.webkitGetUserMedia

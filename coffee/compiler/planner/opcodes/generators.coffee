@@ -20,8 +20,8 @@ do ->
         osc.channelInterpretation = "speakers"
         osc.channelCount = 1
 
-        bindParam tree, "freq", osc.frequency
-        bindParam tree, "detune", osc.detune
+        bindParam tree, "freq", osc.frequency, @planner
+        bindParam tree, "detune", osc.detune, @planner
         bindCallback tree, "waveform", (waveform) -> osc.type = waveform
 
         osc.start(0)

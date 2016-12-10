@@ -19,14 +19,19 @@ do ->
     param.setValueAtTime(value,timestamp)
 
   coffeesound.compiler.planner.utils.bindParam =
-  bindParam = (source,sourceName,param) ->
-    # (max) TODO - fix this so we can bind param -> param
+  bindParam = (source,sourceName,param,planner) ->
     src = extractExpression(source,sourceName)
-    if RATE.E_RATE is src.rate
+    if RATE.A_RATE is src.rate
+      if null != (node = planner.planLater(src))
+        param.value = 0
+        node.connect(param)
+      else
+        throw new Error("unable to plan node: #{src}")
+    else if RATE.E_RATE is src.rate
       src.subscribe (v) -> setParam(param,v)
       setParam(param,src.value)
     else
-      throw new Error("cannot bind source of type: #{source.rate}")
+      throw new Error("cannot bind source of type: #{src.rate}")
     return
 
   coffeesound.compiler.planner.utils.bindValue =

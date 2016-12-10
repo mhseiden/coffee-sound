@@ -6,6 +6,9 @@ goog.require "coffeesound.expressions"
 do ->
   ASTJS = coffeesound.external.astjs
 
+  # alias as OpcodeNode, since TreeNode is too generic
+  OpcodeNode = coffeesound.opcodes.TreeNode
+
   { ExpressionTree, Literal } = coffeesound.expressions
 
   coffeesound.compiler.analyzer.types.TypingBatch =
@@ -20,8 +23,14 @@ do ->
     constructor: -> super()
 
     execute: (tree) ->
-      tree.transformUp (node) ->
-        newArgs = _.map node.args, (arg) -> if arg instanceof ExpressionTree then arg else new Literal(arg)
+      tree.transformUp (node) =>
+        newArgs = _.map node.args, (arg) =>
+          if arg instanceof ExpressionTree
+            arg
+          else if arg instanceof OpcodeNode
+            @execute(arg)
+          else
+            new Literal(arg)
         newNode = node.copy(newArgs,node.children)
         newNode.nodeid = node.nodeid # injecting literals doesn't change the node's meaning
         return newNode

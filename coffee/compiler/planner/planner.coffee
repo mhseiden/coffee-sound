@@ -18,7 +18,8 @@ do ->
         new opcodes.io.Strategy(),
         new opcodes.generators.Strategy(),
         new opcodes.math.Strategy(),
-        new opcodes.modifiers.Strategy()]
+        new opcodes.modifiers.Strategy(),
+      ]
 
       super(extra.concat(builtin))
 

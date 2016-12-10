@@ -8,6 +8,7 @@ do ->
 
   coffeesound.opcodes.generators.OscillatorNode =
   class OscillatorNode extends coffeesound.opcodes.LeafNode
+    nodeName: -> "Oscillator"
     constructor: (freq,detune,waveform) ->
       args = [freq,detune,waveform]
       super(A_RATE,OscillatorNode,args)

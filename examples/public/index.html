@@ -2,6 +2,14 @@
   <head>
     <link type="text/css" rel="stylesheet" href="/css/reset.css"></link>
     <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/coffee-sound.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        coffeesound.initialize().then(function() {
+          console.log("coffeesound initalized");
+        });
+      });
+    </script>
   </head>
   <body>
     <style>
