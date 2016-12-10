@@ -23,7 +23,7 @@ do ->
     src = extractExpression(source,sourceName)
     if RATE.A_RATE is src.rate
       if null != (node = planner.planLater(src))
-        param.value = 0
+        param.value = 0 # "[...] summing with the intrinsic parameter value" - see: https://webaudio.github.io/web-audio-api/#AudioParam
         node.connect(param)
       else
         throw new Error("unable to plan node: #{src}")
